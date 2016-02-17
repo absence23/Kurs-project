@@ -109,6 +109,13 @@ public class Article implements java.io.Serializable {
         this.tags.addAll(tags);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj != null)
+            return id == ((Article)obj).id;
+        return false;
+    }
+
     public void addTag(Tag tag) {
         this.tags.add(tag);
     }

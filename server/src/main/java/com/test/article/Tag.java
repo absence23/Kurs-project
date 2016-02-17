@@ -26,7 +26,7 @@ public class Tag  {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "tag", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "article", fetch = FetchType.EAGER)
     private Set<Article> articles = new HashSet<>(0);
     public Set<Article> getArticles(){
         return this.articles;
@@ -59,5 +59,12 @@ public class Tag  {
         name = tag.name;
         id = tag.id;
         articles = tag.articles;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj != null)
+            return id == ((Tag)obj).id;
+        return false;
     }
 }
