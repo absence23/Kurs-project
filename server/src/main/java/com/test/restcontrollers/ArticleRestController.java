@@ -33,13 +33,13 @@ public class ArticleRestController {
         for (Tag tag : tagSet) {
             Tag temp;
             if((temp = simpleTagRepository.findOneByName(tag.getName())) != null)
-                tag = temp;
+                tag.copyFrom(temp);
             tag.addArticle(article);
             accountService.update(tag);
         }
         article = articleRepository.findOneById(id);
-        article.updateTags(tagSet);
-        accountService.update(article);
+//        article.updateTags(tagSet);
+//        accountService.update(article);
         return 0;
     }
 

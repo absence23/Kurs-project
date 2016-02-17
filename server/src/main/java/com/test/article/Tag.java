@@ -26,7 +26,7 @@ public class Tag  {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "article", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "tag", fetch = FetchType.EAGER)
     private Set<Article> articles = new HashSet<>(0);
     public Set<Article> getArticles(){
         return this.articles;
@@ -54,4 +54,10 @@ public class Tag  {
     }
 
     protected Tag(){}
+
+    public void copyFrom(Tag tag){
+        name = tag.name;
+        id = tag.id;
+        articles = tag.articles;
+    }
 }

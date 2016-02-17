@@ -47,7 +47,7 @@ public class Article implements java.io.Serializable {
         this.authorEmail = authorEmail;
     }
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name="article_tags",
             joinColumns=
             @JoinColumn(name="article_id", referencedColumnName="id"),
