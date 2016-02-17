@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" ng-app="app">
+<head>
+    <title>Welcome!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../../resources/css/ng-tags-input.bootstrap.min.css"
+          th:href="@{/resources/css/ng-tags-input.bootstrap.min.css}">
+    <link rel="stylesheet" href="../../../resources/css/ng-tags-input.min.css"
+          th:href="@{/resources/css/ng-tags-input.min.css}">
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script src="../../../resources/js/sanitize.js" th:href="@{/resources/js/santize.js}"></script>
+    <script src="../../../resources/js/angular-route.js" th:href="@{/resources/js/angular-route.js}"></script>
+    <script src="../../../resources/js/showdown.js" th:href="@{/resources/js/showdown.js}"></script>
+    <script src="../../../resources/js/angular-markdown-text.js"
+            th:href="@{/resources/js/angular-markdown-text.js}"></script>
+    <script src="../../../resources/js/ng-tags-input.min.js" th:href="@{/resources/js/ng-tags-input.min.js}"></script>
+    <script th:inline="javascript" src="../../../resources/js/articleController.js"
+            th:href="@{/resources/js/articleController.js}"></script>
+    <style>
+        textarea {
+            resize: none;
+        }
+        .bootstrap .tags {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+        }
+
+        .bootstrap .tags.focused {
+            border-color: #2b39ff !important;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+        }
+
+        .bootstrap .tags .tag-item {
+            background: #2b39ff !important;
+            border: 1px solid #2b39ff;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+
+        .row {
+            margin: 0.5em;
+        }
+    </style>
+</head>
+<body ng-controller="ArticleController as ctrl">
+<div th:replace="fragments/header :: header">&nbsp;</div>
+<div class="container-fluid">
+    <form action="#" class="form-horizontal" method="post" data-th-action="@{/action/article/edit}"
+          data-th-object="${articleForm}">
+        <div th:attr="ng-show='ctrl.isEditing ||' + ${articleForm.isNew}">
+            <th:block th:if="${#fields.hasErrors('${articleForm.*}')}">
+                <div th:replace="fragments/alert :: alert (type='danger', message='Form contains errors. Please try again.')">
+                    Alert
+                </div>
+            </th:block>
+            <fieldset>
+                <legend>Article edit</legend>
+                <div class="form-group row" th:classappend="${#fields.hasErrors('name')}? 'has-error'">
+                    <label for="name" class="col-lg-2 control-label">Name</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="name" placeholder="Name" th:field="*{name}"/>
+                        <span class="help-block" th:if="${#fields.hasErrors('name')}"
+                              th:errors="*{name}">Input valid name</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="name" class="col-lg-2 control-label">Category</label>
+                    <div class="col-lg-8">
+                        <select type="" class="form-control" id="category" placeholder="Name" th:field="*{category}">
+                            <option th:each="c:${articleForm.getCategories()}" th:value="${c}"><p
+                                    th:text="${c.name()}"></p></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="col-lg-2 control-label">Description</label>
+                    <div class="col-lg-8">
+                        <textarea rows="5" type="text" class="form-control" id="description" placeholder="Description"
+                                  th:field="*{description}"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="col-lg-2 control-label">Tags</label>
+                    <div class="col-lg-8">
+                        <tags-input class="bootstrap" display-property="name" ng-model="ctrl.tags" id="tags"
+                                    placeholder="Tags"></tags-input>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="article" class="col-lg-2 control-label">Article</label>
+                    <div class="col-lg-8">
+                        <textarea ng-model="ctrl.text" rows="10" type="text" class="form-control" id="article"
+                                  placeholder="Content"></textarea>
+                        <label>Preview</label>
+                        <div markdown="ctrl.text"></div>
+                        <textarea style="visibility: hidden" ng-model="ctrl.text" type="text"
+                                  th:field="*{article}"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group text-center">
+                    <div class="row">
+                        <button name="action" value="save" ng-click="ctrl.save()" type="submit"
+                                class="btn btn-default">
+                            Save
+                        </button>
+                        <button name="action" value="cancel" class="btn btn-default">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+    <form action="#" class="form-horizontal" method="post" data-th-action="@{/action/article/edit}">
+        <div th:attr="ng-show='!ctrl.isEditing &&' + !${articleForm.isNew}" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 th:text="${articleForm.name}"></h2>
+                <sub><a th:text="${articleForm.email}"
+                        th:href="@{/profile/show/{email}(email=${articleForm.email})}"></a></sub>
+                <kbd th:text="${articleForm.getCategory()}" class="text-right" style="float: right"></kbd>
+            </div>
+            <div th:if="!${articleForm.isNew}"
+                 th:attr="ng-init='ctrl.articleInit(\'' + ${articleForm.id} + '\');'"></div>
+            <div class="panel-group row">
+                <div class="col-sm-10">
+                    <blockquote class="blockquote-reverse">
+                        <small th:text="${articleForm.description}"></small>
+                    </blockquote>
+                </div>
+            </div>
+            <div class="panel-group row">
+                <markdown markdown-model="ctrl.text"></markdown>
+            </div>
+            <div class="panel-group">
+                <tags-input class="bootstrap" ng-disabled="true" display-property="name" ng-model="ctrl.tags" placeholder=" - tags"></tags-input>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <span th:if="${articleForm.isEditable()}" ng-click="ctrl.edit()" class="btn btn-default"><span
+                            class="glyphicon glyphicon-edit"></span> Edit</span>
+                    <button th:if="${articleForm.isEditable()}" name="action" value="delete" class="btn btn-default">
+                        <span class="glyphicon glyphicon-trash"></span> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
