@@ -20,15 +20,15 @@
         <div th:replace="fragments/alert :: alert (type='danger', message='Sign in error. Please try again.')">Alert</div>
     </th:block>
     <fieldset>
-        <legend>Please Sign In</legend>
+        <legend th:text="#{signin}"></legend>
         <div class="form-group">
-            <label for="inputEmail" class="col-lg-2 control-label">Email</label>
+            <label for="inputEmail" class="col-lg-2 control-label" th:text="#{email}"></label>
             <div class="col-lg-10">
                 <input type="text" class="form-control" id="inputEmail" placeholder="Email" name="username" />
             </div>
         </div>
         <div class="form-group">
-            <label for="inputPassword" class="col-lg-2 control-label">Password</label>
+            <label for="inputPassword" class="col-lg-2 control-label" th:text="#{password}"></label>
             <div class="col-lg-10">
                 <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="password" />
             </div>
@@ -37,19 +37,19 @@
             <div class="col-lg-offset-2 col-lg-10">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="_spring_security_remember_me" /> Remember me
+                        <input th:text="#{remember_me}" type="checkbox" name="_spring_security_remember_me" />
                     </label>
                 </div>
             </div>
         </div>
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-10">
-                <button type="submit" class="btn btn-default">Sign in</button>
+                <button type="submit" class="btn btn-default" th:text="#{signin}"></button>
             </div>
         </div>
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-10">
-                <p>New here? <a href="signup" th:href="@{/signup}">Sign Up</a></p>
+                <p>New here? <a href="signup" th:href="@{/signup}" th:text="#{signup}"></a></p>
             </div>
         </div>
     </fieldset>

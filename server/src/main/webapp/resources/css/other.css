@@ -1,0 +1,35 @@
+textarea {
+    resize: none;
+}
+.row {
+    margin: 0.5em;
+}
+.btn-circle {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    padding: 7px 0;
+    font-size: 16px;
+    border-radius: 20px;
+}
+.btn-fixed{
+    text-align: center;
+    position: fixed;
+    bottom: 3%;
+    right: 5%;
+    z-index: 10;
+}
+.btn-fixed-container{
+    position: relative;
+}
+.category-right{
+    float: right;
+}
+.tag {
+    background: #3d5fd9;
+    color: white;
+}
+.scrolled-panel{
+    overflow-y: scroll;
+    height: 500px;
+}

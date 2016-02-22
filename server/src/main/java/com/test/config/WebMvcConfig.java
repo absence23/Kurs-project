@@ -4,15 +4,16 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -20,12 +21,14 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
-import com.test.Application;
+import java.util.Locale;
 
 @Configuration
 class WebMvcConfig extends WebMvcConfigurationSupport {
 
-    private static final String MESSAGE_SOURCE = "/WEB-INF/i18n/messages";
+    private static final String MESSAGE_SOURCE = "/WEB-INF/i18n/labels";
+    private static final String VALIDATOR_MESSAGE_SOURCE = "/WEB-INF/i18n/messages";
+
     private static final String VIEWS = "/WEB-INF/views/";
 
     private static final String RESOURCES_LOCATION = "/resources/";
@@ -39,12 +42,41 @@ class WebMvcConfig extends WebMvcConfigurationSupport {
         return requestMappingHandlerMapping;
     }
 
+
     @Bean(name = "messageSource")
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename(MESSAGE_SOURCE);
+        messageSource.setDefaultEncoding("Windows-1251");
+        return messageSource;
+    }
+
+    @Bean(name = "validatorMessageSource")
+    public MessageSource validatorMessageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename(VALIDATOR_MESSAGE_SOURCE);
         messageSource.setCacheSeconds(5);
         return messageSource;
+    }
+
+    @Bean(name = "localeChangeInterceptor")
+    public LocaleChangeInterceptor localeChangeInterceptor(){
+        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+        localeChangeInterceptor.setParamName("lang");
+        return localeChangeInterceptor;
+    }
+
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(localeChangeInterceptor());
+        super.addInterceptors(registry);
+    }
+
+    @Bean(name = "localeResolver")
+    public CookieLocaleResolver localeResolver(){
+        CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+        localeResolver.setDefaultLocale(new Locale("en"));
+        return localeResolver;
     }
 
     @Bean
@@ -62,6 +94,7 @@ class WebMvcConfig extends WebMvcConfigurationSupport {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
         templateEngine.addDialect(new SpringSecurityDialect());
+        templateEngine.setMessageSource(messageSource());
         return templateEngine;
     }
 
@@ -69,14 +102,15 @@ class WebMvcConfig extends WebMvcConfigurationSupport {
     public ThymeleafViewResolver viewResolver() {
         ThymeleafViewResolver thymeleafViewResolver = new ThymeleafViewResolver();
         thymeleafViewResolver.setTemplateEngine(templateEngine());
-        thymeleafViewResolver.setCharacterEncoding("UTF-8");
+        thymeleafViewResolver.setCharacterEncoding("Windows-1251");
         return thymeleafViewResolver;
     }
+
 
     @Override
     public Validator getValidator() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.setValidationMessageSource(messageSource());
+        validator.setValidationMessageSource(validatorMessageSource());
         return validator;
     }
 
@@ -84,6 +118,8 @@ class WebMvcConfig extends WebMvcConfigurationSupport {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler(RESOURCES_HANDLER).addResourceLocations(RESOURCES_LOCATION);
     }
+
+
 
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
@@ -100,5 +136,4 @@ class WebMvcConfig extends WebMvcConfigurationSupport {
             return "forward:/resources/images/favicon.ico";
         }
     }
-
 }

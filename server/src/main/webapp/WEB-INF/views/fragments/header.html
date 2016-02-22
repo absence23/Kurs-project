@@ -1,27 +1,63 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" th:if="${session.userThemes} == 'light'"
+          href="../../../resources/css/cerulean.bootstrap.min.css"
+          th:href="@{/resources/css/cerulean.bootstrap.min.css}"/>
+    <link rel="stylesheet" th:if="${session.userThemes} == 'dark'"
+          href="../../../resources/css/cyborg.bootstrap.min.css" th:href="@{/resources/css/cyborg.bootstrap.min.css}"/>
+
     <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script src="../../../resources/js/jquery.autosize.js" th:href="@{/resources/js/jquery.autosize.js}"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="navbar navbar-inverse navbar-static-top" th:fragment="header">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button th:if="${#authorization.expression('isAuthenticated()')}" type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Study portal</a>
+            <div class="dropdown">
+                <button class="navbar-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                    <i class="glyphicon glyphicon-menu-hamburger" style="color: white"></i>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu navbar-inverse" aria-labelledby="dropdownMenu1">
+                    <li th:if="!${#authorization.expression('isAuthenticated()')}"><a href="/signin"
+                                                                                      th:href="@{/signin}">
+                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign in
+                    </a></li>
+                    <li th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a href="../home/profile.html" th:href="@{/profile/show}">
+                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;Profile
+                        </a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a href="/logout" th:href="@{/logout}" onclick="get('#form').submit();">
+                            <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <a class="navbar-header navbar-brand" th:href="@{/}">Study portal</a>
+            <div class="btn-group navbar-brand navbar-right">
+                <a class="btn btn-secondary btn-danger btn-xs" href="?lang=en">En</a>
+                <a class="btn btn-secondary btn-warning btn-xs" href="?lang=de">De</a>
+                <a class="btn btn-secondary btn-info btn-xs" href="?lang=ru">Ru</a>
+            </div>
+            <div class="btn-group navbar-brand navbar-right">
+                <a class="btn btn-secondary btn-default btn-xs" href="#" th:href="@{/light}">Light</a>
+                <a class="btn btn-secondary btn-default btn-xs" href="#" th:href="@{/dark}">Dark</a>
+            </div>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
+                <li sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a th:href="@{/admin/users}">
+                        <span class="glyphicon glyphicon-user"></span>&nbsp;Users
+                    </a>
+                </li>
                 <li th:if="${#authorization.expression('!isAuthenticated()')}">
                     <a href="/signin" th:href="@{/signin}">
                         <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign in
@@ -38,7 +74,8 @@
                     </a>
                 </li>
                 <li>
-                    <form style="visibility: hidden" id="form" method="post" action="/logout" th:action="@{/logout}"></form>
+                    <form style="visibility: hidden" id="form" method="post" action="/logout"
+                          th:action="@{/logout}"></form>
                 </li>
             </ul>
         </div>

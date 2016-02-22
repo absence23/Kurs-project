@@ -14,11 +14,6 @@ import java.util.Set;
 @Entity
 @Table(name = "tag")
 public class Tag  {
-    @Override
-    public String toString() {
-        return name;
-    }
-
     @Id
     @GeneratedValue
     private Long id;
@@ -26,8 +21,14 @@ public class Tag  {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "article", fetch = FetchType.EAGER)
-    private Set<Article> articles = new HashSet<>(0);
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @JoinTable(name="article_tags",
+            joinColumns=
+            @JoinColumn(name="tag_id", referencedColumnName="id"),
+            inverseJoinColumns=
+            @JoinColumn(name="article_id", referencedColumnName="id")
+    )
+    private Set<Article> articles = new HashSet<>();
     public Set<Article> getArticles(){
         return this.articles;
     }
@@ -55,6 +56,10 @@ public class Tag  {
 
     protected Tag(){}
 
+    public void deleteArticle(Article article){
+        articles.remove(article);
+    }
+
     public void copyFrom(Tag tag){
         name = tag.name;
         id = tag.id;
@@ -66,5 +71,18 @@ public class Tag  {
         if(obj != null)
             return id == ((Tag)obj).id;
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public boolean isEmpty(){
+        return articles.isEmpty();
+    }
+
+    public Set<Article> sendedArticles(){
+        return articles;
     }
 }

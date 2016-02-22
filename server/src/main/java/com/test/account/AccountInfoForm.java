@@ -13,7 +13,6 @@ public class AccountInfoForm {
 
     private static final String NOT_BLANK_MESSAGE = "{notBlank.message}";
 
-    @NotBlank(message = AccountInfoForm.NOT_BLANK_MESSAGE)
     @Length(max = 20)
     private String name;
 
@@ -29,26 +28,17 @@ public class AccountInfoForm {
     @Length(max = 500)
     private String about;
 
-    private boolean isEditable;
 
-    AccountInfoForm(){
+    public AccountInfoForm(){
         super();
     }
-    AccountInfoForm(Account account){
+    public AccountInfoForm(Account account){
         AccountInfo info = account.getInfo();
         name = info.getName();
         education = info.getEducation();
         country = info.getCountry();
         interests = info.getInterests();
         about = info.getAbout();
-    }
-
-    public boolean isEditable() {
-        return isEditable;
-    }
-
-    public void setEditable(boolean editable) {
-        isEditable = editable;
     }
 
     public String getName() {

@@ -12,8 +12,9 @@ public class ArticleForm {
 
     @NotBlank
     @Valid
-    private String name;
+    private String name = "Undefined";
 
+    @Length(max = 500)
     private String description = "";
 
     private String article = "";
@@ -97,16 +98,13 @@ public class ArticleForm {
     }
 
     public void saveArticle(Account account){
-        if(!isNew)
-            setArticleParams(account.getArticleById(id));
-        else
-            account.addArticle(createArticle(account));
-    }
-
+        setArticleParams(account.getArticleById(id));
+    }   
 
     public void setArticleParams(Article article) {
-        article.setDescription(description);
+        article.setName(this.name);
+        article.setDescription(this.description);
         article.setArticle(this.article);
-        article.setCategory(category);
+        article.setCategory(this.category);
     }
 }

@@ -23,6 +23,8 @@ public class AccountInfo implements java.io.Serializable {
 
     private String about = "";
 
+    private String themes = "light";
+
     @OneToOne
     @JsonIgnore
     @JoinColumn(name = "account_id")
@@ -37,6 +39,14 @@ public class AccountInfo implements java.io.Serializable {
         this.interests = interests;
         this.about = about;
         this.account = account;
+    }
+
+    public String getThemes() {
+        return themes;
+    }
+
+    public void setThemes(String themes) {
+        this.themes = themes;
     }
 
     public String getCountry() {

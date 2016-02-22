@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
-import com.test.account.AccountService;
+import com.test.service.AccountService;
 
 @Configuration
 @EnableWebSecurity

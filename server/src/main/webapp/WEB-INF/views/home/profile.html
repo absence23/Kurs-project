@@ -3,10 +3,10 @@
 <head>
     <title>Welcome!</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
-          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" th:if="${session.userThemes} == 'light'" href="../../../resources/css/cerulean.bootstrap.min.css" th:href="@{/resources/css/cerulean.bootstrap.min.css}"/>
+    <link rel="stylesheet" th:if="${session.userThemes} == 'dark'"  href="../../../resources/css/cyborg.bootstrap.min.css" th:href="@{/resources/css/cyborg.bootstrap.min.css}"/>
+    <link href="../../../resources/css/other.css" rel="stylesheet" th:href="@{/resources/css/other.css}"/>
+
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
             integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
@@ -14,114 +14,104 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
     <script src="../../../resources/js/profileController.js"
             th:href="@{/resources/js/profileController.js}"></script>
-    <style>
-        textarea {
-            resize: none;
-        }
-
-        .row {
-            margin: 0.5em;
-        }
-    </style>
 </head>
 <body ng-controller="ProfileController as ctrl">
 <div th:replace="fragments/header :: header">&nbsp;</div>
-<div class="container-fluid">
+<div class="container-fluid btn-fixed-container">
     <form class="form-narrow form-horizontal" method="post" th:action="@{/profile/edit/{email}(email=${owner})}" th:object="${accountInfoForm}">
         <div ng-show="!ctrl.isEditing" class="panel panel-default">
             <div class="panel-heading">
                 <h3 th:text="${owner}" class="panel-title"></h3>
             </div>
             <div class="panel-group row">
-                <div class="col-sm-2 centered-text"><strong>Name</strong></div>
+                <div class="col-sm-2 centered-text"><strong th:text="#{name}"></strong></div>
                 <div class="col-sm-10">
                     <pre th:text="${accountInfoForm.name}"></pre>
                 </div>
             </div>
             <div class="panel-group row">
-                <div class="col-sm-2 centered-text"><strong>Country</strong></div>
+                <div class="col-sm-2 centered-text"><strong th:text="#{country}"></strong></div>
                 <div class="col-sm-10">
                     <pre th:text="${accountInfoForm.country}"></pre>
                 </div>
             </div>
             <div class="panel-group row">
-                <div class="col-sm-2 centered-text"><strong>Education</strong></div>
+                <div class="col-sm-2 centered-text"><strong th:text="#{education}"></strong></div>
                 <div class="col-sm-10">
                     <pre th:text="${accountInfoForm.education}"></pre>
                 </div>
             </div>
             <div class="panel-group row">
-                <div class="col-sm-2 centered-text"><strong>Interests</strong></div>
+                <div class="col-sm-2 centered-text"><strong th:text="#{interests}"></strong></div>
                 <div class="col-sm-10">
                     <pre class="pre-scrollable" th:text="${accountInfoForm.interests}"></pre>
                 </div>
             </div>
             <div class="panel-group row">
-                <div class="col-sm-2 centered-text"><strong>About me</strong></div>
+                <div class="col-sm-2 centered-text"><strong th:text="#{about}"></strong></div>
                 <div class="col-sm-10">
                     <pre class="pre-scrollable" th:text="${accountInfoForm.about}"></pre>
                 </div>
             </div>
             <div class="panel-footer">
-                <span th:if="${accountInfoForm.isEditable()}" ng-click="ctrl.edit()" class="btn btn-default"><span
-                        class="glyphicon glyphicon-edit"></span>Edit</span>
+                <span th:if="${isEditable}" ng-click="ctrl.edit()" class="btn btn-default"><span
+                        class="glyphicon glyphicon-edit" ></span></span>
             </div>
         </div>
-        <div ng-show="ctrl.isEditing">
-            <!--/* Show general error message when form contains errors */-->
+        <div ng-show="ctrl.isEditing" th:if="${isEditable}">
+            <div class="row btn-fixed">
+                <button ng-click="ctrl.save()" type="submit"
+                        class="btn btn-primary btn-circle"><span class="glyphicon glyphicon-ok"></span>
+                </button>
+                <button type="reset" ng-click="ctrl.reset()" class="btn btn-primary btn-circle">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
             <th:block th:if="${#fields.hasErrors('${accountInfoForm.*}')}">
                 <div th:replace="fragments/alert :: alert (type='danger', message='Form contains errors. Please try again.')">
                     Alert
                 </div>
             </th:block>
             <fieldset>
-                <legend>Please add information about yourself</legend>
+                <legend th:text="#{add_information}"></legend>
                 <div class="form-group" th:classappend="${#fields.hasErrors('name')}? 'has-error'">
-                    <label for="name" class="col-lg-2 control-label">Name</label>
+                    <label for="name" class="col-lg-2 control-label" th:text="#{name}"></label>
                     <div class="col-lg-10">
-                        <input type="text" class="form-control" id="name" placeholder="Name" th:field="*{name}"/>
+                        <input type="text" class="form-control" id="name" th:placeholder="#{name}" th:field="*{name}"/>
                         <span class="help-block" th:if="${#fields.hasErrors('name')}"
                               th:errors="*{name}">Too big string</span>
                     </div>
                 </div>
                 <div class="form-group" th:classappend="${#fields.hasErrors('country')}? 'has-error'">
-                    <label for="country" class="col-lg-2 control-label">Country</label>
+                    <label for="country" class="col-lg-2 control-label" th:text="#{country}"></label>
                     <div class="col-lg-10">
-                        <input type="text" class="form-control" id="country" placeholder="Country"
+                        <input type="text" class="form-control" id="country" th:placeholder="#{country}"
                                th:field="*{country}"/>
                         <span class="help-block" th:if="${#fields.hasErrors('country')}" th:errors="*{country}">Too big string</span>
                     </div>
                 </div>
                 <div class="form-group" th:classappend="${#fields.hasErrors('education')}? 'has-error'">
-                    <label for="education" class="col-lg-2 control-label">Education</label>
+                    <label for="education" class="col-lg-2 control-label" th:text="#{education}"></label>
                     <div class="col-lg-10">
-                        <input type="text" class="form-control" id="education" placeholder="Education"
+                        <input type="text" class="form-control" id="education" th:placeholder="#{education}"
                                th:field="*{education}"/>
                         <span class="help-block" th:if="${#fields.hasErrors('education')}" th:errors="*{education}">Too big string</span>
                     </div>
                 </div>
                 <div class="form-group" th:classappend="${#fields.hasErrors('interests')}? 'has-error'">
-                    <label for="interests" class="col-lg-2 control-label">Interests</label>
+                    <label for="interests" class="col-lg-2 control-label" th:text="#{interests}"></label>
                     <div class="col-lg-10">
-                        <textarea type="text" class="form-control" id="interests" placeholder="Interests"
+                        <textarea type="text" class="form-control" id="interests" th:placeholder="#{interests}"
                                   th:field="*{interests}"></textarea>
                         <span class="help-block" th:if="${#fields.hasErrors('interests')}" th:errors="*{interests}">Too big string</span>
                     </div>
                 </div>
                 <div class="form-group" th:classappend="${#fields.hasErrors('about')}? 'has-error'">
-                    <label for="about" class="col-lg-2 control-label">About yourself </label>
+                    <label for="about" class="col-lg-2 control-label" th:text="#{about}"></label>
                     <div class="col-lg-10">
-                        <textarea type="text" class="form-control" id="about" placeholder="About"
+                        <textarea type="text" class="form-control" id="about" th:placeholder="#{about}"
                                   th:field="*{about}"></textarea>
                         <span class="help-block" th:if="${#fields.hasErrors('about')}" th:errors="*{about}">Too big string</span>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-md-offset-2 col-md-1 col-xs-1">
-                        <button ng-click="ctrl.save()" type="submit" class="btn btn-default">Save</button>
-                    </div>
-                    <div class="col-md-1 col-xs-1">
-                        <button ng-click="ctrl.reset()" type="reset" class="btn btn-default">Cancel</button>
                     </div>
                 </div>
             </fieldset>
@@ -129,16 +119,16 @@
     </form>
 
     <div class="span8" ng-show="!ctrl.isEditing">
+        <div class="btn-fixed">
+            <a th:href="@{/article/add/{email}(email=${owner})}"
+               th:if="${isEditable}" class="btn btn-success btn-circle"><i
+                    class="glyphicon glyphicon-plus"></i></a>
+        </div>
         <div class="panel panel-default">
 
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-4 col-xs-4">Articles</div>
-                    <div class="col-md-1 col-xs-offset-5 col-xs-1 col-md-offset-7">
-                        <a th:href="@{/article/add/{email}(email=${owner})}"
-                           th:if="${accountInfoForm.isEditable()}" class="btn btn-default"><i
-                                class="glyphicon glyphicon-plus"></i></a>
-                    </div>
+                    <div class="col-md-4 col-xs-4" th:text="#{articles}"></div>
                 </div>
             </div>
             <div class="panel-body">
@@ -148,7 +138,7 @@
                            class="btn-link">
                             <h4 th:text="${article.name}"></h4>
                         </a>
-                        <kbd th:text="${article.category.name()}" style="float: right"></kbd>
+                        <kbd th:text="${article.category.name()}" class="category-right"></kbd>
                     </div>
                     <div class="row">
                         <blockquote><small th:text="${article.description}"></small></blockquote>

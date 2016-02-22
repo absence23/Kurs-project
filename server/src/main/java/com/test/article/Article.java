@@ -2,7 +2,15 @@ package com.test.article;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.test.account.Account;
+import jdk.nashorn.internal.ir.debug.JSONWriter;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import javax.persistence.*;
 import java.util.*;
@@ -13,7 +21,7 @@ import java.util.*;
 public class Article implements java.io.Serializable {
 
     public static enum Category{
-        BIOLOGY, PROGRAMMING, MATHEMATICS
+        BIOLOGY, PROGRAMMING, MATHEMATICS, PHYSICS, LITERATURE, CHEMISTRY, ENGLISH, GERMAN, OTHERS
     }
 
     @Id
@@ -26,7 +34,6 @@ public class Article implements java.io.Serializable {
 
     private String description;
 
-    @Column(length = 20000)
     private String article;
 
     private Category category;
@@ -47,22 +54,24 @@ public class Article implements java.io.Serializable {
         this.authorEmail = authorEmail;
     }
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name="article_tags",
             joinColumns=
             @JoinColumn(name="article_id", referencedColumnName="id"),
             inverseJoinColumns=
             @JoinColumn(name="tag_id", referencedColumnName="id")
     )
-    private Set<Tag> tags = new HashSet<>();
-
-    public Set<Tag> getTags() {
-        return tags;
-    }
+    Set<Tag> tags = new HashSet<>();
 
     public void setTags(Set<Tag> tags) {
         this.tags = new HashSet<>(tags);
     }
+
+    @JsonIgnore
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
     public Article() {}
 
     public static Article createEmpty(Account account){
@@ -103,9 +112,12 @@ public class Article implements java.io.Serializable {
     }
 
     public void updateTags(Set<Tag> tags){
-        for(Tag tag: this.tags)
-            if(tags.contains(tag))
+        Set<Tag> tagsCopy = new HashSet<>(this.tags);
+        for(Tag tag: tagsCopy)
+            if(!tags.contains(tag)) {
+                tag.deleteArticle(this);
                 this.tags.remove(tag);
+            }
         this.tags.addAll(tags);
     }
 
@@ -140,8 +152,14 @@ public class Article implements java.io.Serializable {
         this.article = article;
     }
 
+
+    public Set<Tag> sendedTags() {
+        return tags;
+    }
+
     @Override
     public String toString() {
         return name;
     }
+
 }

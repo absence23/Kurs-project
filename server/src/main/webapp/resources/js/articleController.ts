@@ -1,37 +1,62 @@
 /// <reference path="angular.d.ts"/>
 
 'use strict';
+
+class Tag{
+    name: string;
+    id: number;
+
+    constructor(id: number, name: string){
+        this.id = id;
+        this.name = name;
+    }
+}
+
 class ArticleController{
     constructor($http: ng.IHttpService){
         this.isEditing = false;
         this.http = $http;
-    this.tags = [
-            { id: 1, name: 'Tag1' },
-            { id: 2, name: 'Tag2' },
-            { id: 3, name: 'Tag3' }
-        ];
+    this.tags = new Array();
     }
 
-    tags: any;
+    tags: Tag[];
+    sendedTags: any;
     isEditing: boolean;
     text: any;
     http: ng.IHttpService;
     id: number;
 
 
+    loadTags(query) {
+        return this.http.get("/article/gettags/all").then((data) => {
+            this.sendedTags = data.data;
+            var tags = new Array();
+            this.setTags(tags);
+            return tags.filter(function(tag){return tag.name.indexOf(query) != -1;});
+        });
+    };
+
     articleInit(id: number){
+        console.log("init");
+        console.log(id);
         this.id = id;
         this.getTags();
         this.http.get("/article/get/" + id).success((data, status) => this.text = data.article);
     }
 
     getTags(){
-        this.http.get("/article/gettags/" + this.id).success((data, status) => {this.tags = data; console.log(data)})
+        this.http.get("/article/gettags/" + this.id).success((data, status) => {this.sendedTags = data; this.setTags(this.tags);})
+    }
+
+    setTags(tags: any){
+        for(var i = 0; i < this.sendedTags.length; i++){
+            tags[i] = new Tag(this.sendedTags[i].id, this.sendedTags[i].name);
+        }
     }
 
     saveTags(){
-        console.log("save");
-        this.http.post("/article/settags/" + this.id, this.tags).then((data) => console.log(data), (data) => console.log(data));
+        this.http.post("/article/settags/" + this.id, this.tags).success((data, status) => console.log(status));
+        this.http.get("/tag/check/");
     }
 
     edit(){

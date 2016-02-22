@@ -3,12 +3,8 @@
 <head>
     <title>Welcome!</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-
     <link rel="stylesheet" th:if="${session.userThemes} == 'light'" href="../../../resources/css/cerulean.bootstrap.min.css" th:href="@{/resources/css/cerulean.bootstrap.min.css}"/>
     <link rel="stylesheet" th:if="${session.userThemes} == 'dark'"  href="../../../resources/css/cyborg.bootstrap.min.css" th:href="@{/resources/css/cyborg.bootstrap.min.css}"/>
-
-    <link href="../../../resources/css/jqcloud.min.css" rel="stylesheet" media="screen"
-          th:href="@{/resources/css/jqcloud.min.css}"/>
     <link href="../../../resources/css/other.css" rel="stylesheet" th:href="@{/resources/css/other.css}"/>
 
     <script src="http://code.jquery.com/jquery-latest.js"></script>
@@ -16,40 +12,29 @@
             integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
             crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
-    <script src="../../../resources/js/jqcloud.min.js" th:href="@{/resources/js/jqcloud.min.js}"></script>
-    <script src="../../../resources/js/angular-jqcloud.js" th:href="@{/resources/js/angular-jqcloud.js}"></script>
-    <script src="../../../resources/js/mainController.js" th:href="@{/resources/js/mainController.js}"></script>
 </head>
-<body ng-controller="MainController as ctrl">
+<body>
 <div th:replace="fragments/header :: header">&nbsp;</div>
-<div class="container">
-    <div class="col-md-3">
-        <jqcloud words="ctrl.words" width="300" height="300" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
-    </div>
-    <div class="col-md-9">
+<div class="container-fluid btn-fixed-container">
+    <div class="span8">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <div th:text="#{recently_articles}"></div>
+                <div class="row">
+                    <div class="col-md-4 col-xs-4">Users</div>
+                </div>
             </div>
-            <div class="panel-body scrolled-panel" when-scrolled="ctrl.loadMore()">
-                <div class="panel panel-group" ng-repeat="article in posts track by $index">
+            <div class="panel-body">
+                <div class="panel panel-group" th:each="account : ${accounts}">
                     <div class="row panel-title">
-                        <a ng-href="/article/show/{{article.id}}"
+                        <a th:href="@{/profile/show/{email}(email=${account.email})}"
                            class="btn-link">
-                            <h4>{{article.name}}</h4>
+                            <h4 th:text="${account.email}"></h4>
                         </a>
-                        <kbd class="category">{{article.category}}</kbd>
-                    </div>
-                    <div class="row">
-                        <blockquote>
-                            <small>{{article.description}}</small>
-                        </blockquote>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 </body>
 </html>
